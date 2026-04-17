@@ -5,7 +5,6 @@ export default function handler(_req: VercelRequest, res: VercelResponse) {
     status: "ok",
     server: "ultrahuman-mcp",
     version: "1.0.0",
-    transport: "streamable-http",
-    endpoint: "/api/mcp",
+    multi_user: true,
   });
 }

@@ -1,23 +1,25 @@
 {
-  "name": "ultrahuman-mcp-vercel",
+  "name": "ultrahuman-mcp-app",
   "version": "1.0.0",
   "private": true,
-  "description": "Ultrahuman Ring MCP Server for Vercel",
+  "description": "Multi-user Ultrahuman Ring MCP Server with magic link auth",
   "type": "module",
   "scripts": {
+    "dev": "vercel dev",
     "build": "tsc",
-    "dev": "vercel dev"
+    "deploy": "vercel --prod"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
+    "@vercel/kv": "^3.0.0",
     "express": "^5.1.0",
+    "jose": "^6.0.11",
     "zod": "^3.25.67"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/node": "^22.15.3",
     "@vercel/node": "^5.1.8",
-    "typescript": "^5.8.3",
-    "vercel": "^41.7.3"
+    "typescript": "^5.8.3"
   }
 }

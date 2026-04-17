@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultrahuman MCP</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #fafaf9; --bg2: #ffffff; --bg3: #f5f5f4;
+      --fg: #1c1917; --fg2: #57534e; --fg3: #a8a29e;
+      --accent: #059669; --accent2: #047857; --accent-light: #d1fae5;
+      --red: #dc2626; --red-light: #fee2e2;
+      --amber: #d97706; --amber-light: #fef3c7;
+      --border: #e7e5e4; --radius: 12px;
+      --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,.07);
+    }
+
+    body {
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      background: var(--bg); color: var(--fg);
+      line-height: 1.6; min-height: 100vh;
+    }
+
+    /* ─── Layout ─── */
+    .app { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
+    @media (min-width: 640px) { .app { padding: 40px 24px 80px; } }
+
+    /* ─── Header ─── */
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 0; margin-bottom: 32px; border-bottom: 1px solid var(--border);
+    }
+    .logo { font-size: 20px; font-weight: 700; color: var(--fg); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .logo-ring { width: 28px; height: 28px; border: 3px solid var(--accent); border-radius: 50%; }
+    .nav { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .nav a, .nav button {
+      font-size: 13px; padding: 7px 14px; border-radius: 8px; text-decoration: none;
+      color: var(--fg2); background: transparent; border: none; cursor: pointer;
+      font-family: inherit; font-weight: 500; transition: all .15s;
+    }
+    .nav a:hover, .nav button:hover { background: var(--bg3); }
+    .nav .active { background: var(--accent-light); color: var(--accent2); }
+
+    /* ─── Cards ─── */
+    .card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px; margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+    .card h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .card h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; color: var(--fg); }
+    .card p { font-size: 14px; color: var(--fg2); margin-bottom: 12px; }
+
+    /* ─── Forms ─── */
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--fg); margin-bottom: 6px; }
+    input[type="email"], input[type="text"], input[type="password"] {
+      width: 100%; padding: 12px 14px; font-size: 15px; border: 1px solid var(--border);
+      border-radius: 8px; font-family: inherit; background: var(--bg);
+      transition: border-color .15s;
+    }
+    input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(5,150,105,.12); }
+    .input-hint { font-size: 12px; color: var(--fg3); margin-top: 4px; }
+    .input-warn { font-size: 12px; color: var(--amber); margin-top: 4px; font-weight: 500; }
+    .field { margin-bottom: 16px; }
+
+    /* ─── Checkboxes ─── */
+    .checkbox-row {
+      display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; cursor: pointer;
+    }
+    .checkbox-row input[type="checkbox"] {
+      width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); flex-shrink: 0;
+    }
+    .checkbox-row span { font-size: 13px; color: var(--fg2); line-height: 1.5; }
+    .checkbox-row a { color: var(--accent); text-decoration: underline; }
+
+    /* ─── Buttons ─── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px 24px; font-size: 14px; font-weight: 600; border: none;
+      border-radius: 8px; cursor: pointer; font-family: inherit;
+      transition: all .15s; width: 100%; text-decoration: none;
+    }
+    @media (min-width: 640px) { .btn { width: auto; } }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent2); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-outline { background: transparent; color: var(--fg2); border: 1px solid var(--border); }
+    .btn-outline:hover { background: var(--bg3); }
+    .btn-danger { background: var(--red); color: #fff; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-small { padding: 8px 14px; font-size: 13px; width: auto; }
+    .btn-ghost { background: transparent; color: var(--fg2); padding: 8px 14px; font-size: 13px; width: auto; }
+    .btn-ghost:hover { background: var(--bg3); }
+
+    /* ─── Alerts ─── */
+    .alert {
+      padding: 14px 16px; border-radius: 8px; font-size: 14px; margin-bottom: 16px;
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .alert-success { background: var(--accent-light); color: var(--accent2); }
+    .alert-error { background: var(--red-light); color: var(--red); }
+    .alert-warning { background: var(--amber-light); color: var(--amber); }
+
+    /* ─── MCP URL box ─── */
+    .url-box {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+      word-break: break-all; color: var(--fg); display: flex; align-items: center;
+      justify-content: space-between; gap: 10px;
+    }
+    .url-box code { flex: 1; }
+    .url-box button { flex-shrink: 0; }
+
+    /* ─── Table ─── */
+    .table-wrap { overflow-x: auto; margin: 0 -24px; padding: 0 24px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 10px 12px; color: var(--fg3); font-weight: 600; border-bottom: 1px solid var(--border); font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+    td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .badge {
+      display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px;
+      font-weight: 600; text-transform: uppercase;
+    }
+    .badge-active { background: var(--accent-light); color: var(--accent2); }
+    .badge-inactive { background: var(--red-light); color: var(--red); }
+    .badge-admin { background: #ede9fe; color: #7c3aed; }
+    .badge-user { background: var(--bg3); color: var(--fg2); }
+
+    /* ─── Status dot ─── */
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .status-dot.green { background: var(--accent); }
+    .status-dot.red { background: var(--red); }
+    .status-dot.gray { background: var(--fg3); }
+
+    /* ─── Page sections ─── */
+    .page { display: none; }
+    .page.active { display: block; }
+    .hero { text-align: center; padding: 40px 0 32px; }
+    @media (min-width: 640px) { .hero { padding: 64px 0 48px; } }
+    .hero h1 { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
+    @media (min-width: 640px) { .hero h1 { font-size: 36px; } }
+    .hero p { font-size: 16px; color: var(--fg2); max-width: 460px; margin: 0 auto 28px; }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    /* ─── Legal pages ─── */
+    .legal h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+    .legal h2 { font-size: 17px; font-weight: 600; margin: 24px 0 8px; }
+    .legal p, .legal li { font-size: 14px; color: var(--fg2); margin-bottom: 8px; }
+    .legal ul { padding-left: 20px; }
+
+    /* ─── Misc ─── */
+    .hidden { display: none !important; }
+    .text-center { text-align: center; }
+    .mt-4 { margin-top: 16px; }
+    .mt-2 { margin-top: 8px; }
+    .mb-4 { margin-bottom: 16px; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .separator { height: 1px; background: var(--border); margin: 24px 0; }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .fade-in { animation: fadeIn .3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ─── HEADER ─── -->
+  <header class="header" id="header">
+    <a href="#" class="logo"><div class="logo-ring"></div> Ultrahuman MCP</a>
+    <nav class="nav" id="nav"></nav>
+  </header>
+
+  <!-- ─── ALERT AREA ─── -->
+  <div id="alerts"></div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PAGE: HOME (not logged in) -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="page-home" class="page">
+    <div class="hero fade-in">
+      <h1>Pripoj svoj Ultrahuman Ring k&nbsp;Claude</h1>
+      <p>Tento MCP server umožňuje Claude pristupovať k dátam z tvojho Ultrahuman prsteňa — spánok, HRV, recovery, kroky a ďalšie.</p>
+      <div class="hero-actions">
+        <a href="#register" class="btn btn-primary">Registrácia</a>
+        <a href="#login" class="btn btn-outline">Prihlásenie</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Ako to funguje?</h3>
+      <p>1. Zaregistruj sa s emailom z tvojho Ultrahuman účtu</p>
+      <p>2. Zadaj svoj Ultrahuman API token</p>
+      <p>3. Skopíruj svoju osobnú MCP URL do Claude.ai → Settings → Connectors</p>
+      <p style="margin-top:16px"><a href="#gdpr" style="color:var(--accent);font-size:13px">GDPR</a> · <a href="#terms" style="color:var(--accent);font-size:13px">Podmienky používania</a></p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PAGE: REGISTER -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="page-register" class="page">
+    <div class="card fade-in">
+      <h2>Registrácia nového účtu</h2>
+      <p>Vytvorte si účet pre prístup k Ultrahuman MCP serveru.</p>
+      <div class="separator"></div>
+
+      <form id="register-form" onsubmit="return handleRegister(event)">
+        <div class="field">
+          <label for="reg-email">Emailová adresa</label>
+          <input type="email" id="reg-email" placeholder="vas@email.com" required>
+          <p class="input-warn">⚠ Musí to byť emailová adresa vášho osobného konta na ultrahuman.com!</p>
+        </div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="reg-gdpr" required>
+          <span>Súhlasím so spracovaním osobných údajov podľa <a href="#gdpr" target="_blank">GDPR</a></span>
+        </label>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="reg-terms" required>
+          <span>Súhlasím s <a href="#terms" target="_blank">Podmienkami používania</a></span>
+        </label>
+
+        <button type="submit" class="btn btn-primary mt-4" id="reg-submit">
+          Odoslať žiadosť o registráciu
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PAGE: LOGIN -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="page-login" class="page">
+    <div class="card fade-in">
+      <h2>Prihlásenie</h2>
+      <p>Zadajte emailovú adresu a pošleme vám prihlasovací link.</p>
+      <div class="separator"></div>
+
+      <form id="login-form" onsubmit="return handleLogin(event)">
+        <div class="field">
+          <label for="login-email">Emailová adresa</label>
+          <input type="email" id="login-email" placeholder="vas@email.com" required>
+        </div>
+        <button type="submit" class="btn btn-primary" id="login-submit">
+          Odoslať prihlasovací link
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PAGE: DASHBOARD (logged in user) -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="page-dashboard" class="page">
+    <div class="fade-in">
+
+      <!-- MCP URL Card -->
+      <div class="card">
+        <div class="flex-between mb-4">
+          <h2>Tvoja MCP URL</h2>
+          <span class="status-dot" id="mcp-status"></span>
+        </div>
+        <p>Túto URL vlož do Claude.ai → Settings → Connectors → Add custom connector</p>
+        <div class="url-box mt-2" id="mcp-url-box">
+          <code id="mcp-url">Načítavam...</code>
+          <button class="btn btn-small btn-outline" onclick="copyMcpUrl()">Kopírovať</button>
+        </div>
+      </div>
+
+      <!-- Token Management -->
+      <div class="card">
+        <h2>Ultrahuman Auth Token</h2>
+        <p>Váš osobný API token pre prístup k Ultrahuman dátam. Token je šifrovaný a nikto iný ho nevidí.</p>
+        <div class="separator"></div>
+
+        <div class="field">
+          <label>Aktuálny token</label>
+          <div class="url-box" id="current-token-box">
+            <code id="current-token">Načítavam...</code>
+          </div>
+        </div>
+
+        <form onsubmit="return handleTokenUpdate(event)">
+          <div class="field">
+            <label for="new-token">Nový token</label>
+            <input type="text" id="new-token" placeholder="Zadajte váš Ultrahuman Auth Token">
+            <p class="input-hint">Token získate od Ultrahuman podpory (support@ultrahuman.com)</p>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="submit" class="btn btn-primary btn-small" id="token-submit">Uložiť token</button>
+            <button type="button" class="btn btn-ghost" onclick="handleTokenDelete()">Odstrániť token</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Help Card -->
+      <div class="card">
+        <h3>Návod na pripojenie</h3>
+        <p>1. Skopírujte MCP URL vyššie</p>
+        <p>2. V Claude.ai kliknite na profil → Settings → Connectors</p>
+        <p>3. Kliknite "Add custom connector" a vložte URL</p>
+        <p>4. V novom chate zapnite connector cez tlačidlo "+" → Connectors</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PAGE: ADMIN -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="page-admin" class="page">
+    <div class="fade-in">
+      <div class="card">
+        <div class="flex-between mb-4">
+          <h2>Správa používateľov</h2>
+          <button class="btn btn-small btn-outline" onclick="loadAdminUsers()">Obnoviť</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Rola</th>
+                <th>Stav</th>
+                <th>Registrácia</th>
+                <th>Akcia</th>
+              </tr>
+            </thead>
+            <tbody id="admin-users-tbody">
+              <tr><td colspan="5" class="text-center" style="padding:24px;color:var(--fg3)">Načítavam...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PAGE: GDPR -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="page-gdpr" class="page">
+    <div class="card legal fade-in">
+      <h1>Ochrana osobných údajov (GDPR)</h1>
+      <p><em>Posledná aktualizácia: apríl 2026</em></p>
+
+      <h2>1. Prevádzkovateľ</h2>
+      <p>Prevádzkovateľom tejto aplikácie je vlastník nasadenej inštancie Ultrahuman MCP Server.</p>
+
+      <h2>2. Aké údaje zbierame</h2>
+      <ul>
+        <li>Emailová adresa (na účely autentifikácie a identifikácie)</li>
+        <li>Ultrahuman Auth Token (šifrovaný, na účely prístupu k vašim zdravotným dátam)</li>
+        <li>Technické údaje o prihlásení (čas, IP adresa)</li>
+      </ul>
+
+      <h2>3. Účel spracovania</h2>
+      <p>Vaše údaje spracúvame výlučne za účelom poskytovania služby MCP servera — teda sprostredkovania prístupu k vašim zdravotným dátam z Ultrahuman prsteňa pre AI asistenta Claude.</p>
+
+      <h2>4. Právny základ</h2>
+      <p>Spracovanie prebieha na základe vášho výslovného súhlasu (Článok 6(1)(a) GDPR), ktorý udeľujete pri registrácii.</p>
+
+      <h2>5. Uchovávanie údajov</h2>
+      <p>Vaše údaje uchovávame po dobu aktívnosti vášho účtu. Po deaktivácii účtu sú údaje vymazané do 30 dní.</p>
+
+      <h2>6. Vaše práva</h2>
+      <p>Máte právo na prístup k údajom, ich opravu, vymazanie, obmedzenie spracovania, prenositeľnosť a odvolanie súhlasu. Tieto práva môžete uplatniť kontaktovaním správcu systému.</p>
+
+      <h2>7. Bezpečnosť</h2>
+      <p>Vaše Ultrahuman tokeny sú šifrované pomocou AES-256-GCM. Prihlasovacie linky sú jednorazové a platné 30 minút. Komunikácia prebieha výlučne cez HTTPS.</p>
+
+      <h2>8. Zdieľanie s tretími stranami</h2>
+      <p>Vaše údaje nezdieľame so žiadnymi tretími stranami okrem služieb nevyhnutných pre chod aplikácie (hosting, odosielanie emailov). Zdravotné dáta z Ultrahuman API sa nikdy neukladajú — iba sa v reálnom čase predávajú do Claude.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PAGE: TERMS -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="page-terms" class="page">
+    <div class="card legal fade-in">
+      <h1>Podmienky používania</h1>
+      <p><em>Posledná aktualizácia: apríl 2026</em></p>
+
+      <h2>1. Popis služby</h2>
+      <p>Ultrahuman MCP Server je aplikácia, ktorá umožňuje AI asistentovi Claude pristupovať k vašim zdravotným dátam z Ultrahuman prsteňa prostredníctvom Model Context Protocol (MCP).</p>
+
+      <h2>2. Požiadavky na používanie</h2>
+      <ul>
+        <li>Musíte mať aktívny účet na ultrahuman.com</li>
+        <li>Musíte mať platný Ultrahuman API token</li>
+        <li>Emailová adresa zadaná pri registrácii musí zodpovedať vášmu Ultrahuman účtu</li>
+      </ul>
+
+      <h2>3. Zodpovednosť</h2>
+      <p>Služba je poskytovaná „tak ako je" bez akýchkoľvek záruk. Prevádzkovateľ nezodpovedá za presnosť zdravotných dát poskytovaných Ultrahuman API, za výpadky služby, ani za rozhodnutia urobené na základe poskytnutých dát.</p>
+
+      <h2>4. Bezpečnosť účtu</h2>
+      <p>Ste zodpovední za bezpečnosť svojho Ultrahuman API tokenu a prihlasovacieho emailu. MCP URL je osobná — nezdieľajte ju s tretími osobami.</p>
+
+      <h2>5. Deaktivácia účtu</h2>
+      <p>Správca systému môže deaktivovať váš účet bez predchádzajúceho upozornenia v prípade porušenia podmienok alebo zneužívania služby.</p>
+
+      <h2>6. Zmeny podmienok</h2>
+      <p>Prevádzkovateľ si vyhradzuje právo zmeniť tieto podmienky. O zmenách budete informovaní emailom.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let currentUser = null;
+const APP_URL = window.location.origin;
+
+// ═══════════════════════════════════════════
+// ROUTER
+// ═══════════════════════════════════════════
+function getHash() {
+  const h = window.location.hash.slice(1) || 'home';
+  // handle error messages in hash
+  if (h.startsWith('error=')) {
+    showAlert(decodeURIComponent(h.slice(6)), 'error');
+    window.location.hash = '#home';
+    return 'home';
+  }
+  return h;
+}
+
+function navigate(page) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(`page-${page}`);
+  if (el) el.classList.add('active');
+
+  // Update nav
+  document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+  const navLink = document.querySelector(`.nav a[href="#${page}"]`);
+  if (navLink) navLink.classList.add('active');
+
+  // Load data for specific pages
+  if (page === 'dashboard' && currentUser) loadDashboard();
+  if (page === 'admin' && currentUser?.role === 'admin') loadAdminUsers();
+}
+
+function updateNav() {
+  const nav = document.getElementById('nav');
+  if (currentUser) {
+    let links = `
+      <a href="#dashboard">Dashboard</a>
+      ${currentUser.role === 'admin' ? '<a href="#admin">Správca</a>' : ''}
+      <a href="#gdpr">GDPR</a>
+      <a href="#terms">Podmienky</a>
+      <button onclick="handleLogout()">Odhlásiť</button>
+    `;
+    nav.innerHTML = links;
+  } else {
+    nav.innerHTML = `
+      <a href="#gdpr">GDPR</a>
+      <a href="#terms">Podmienky</a>
+    `;
+  }
+}
+
+// ═══════════════════════════════════════════
+// API HELPERS
+// ═══════════════════════════════════════════
+async function api(url, options = {}) {
+  const res = await fetch(url, {
+    headers: { 'Content-Type': 'application/json', ...options.headers },
+    credentials: 'include',
+    ...options,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
+}
+
+function showAlert(message, type = 'success') {
+  const el = document.getElementById('alerts');
+  const icon = type === 'error' ? '✕' : type === 'warning' ? '⚠' : '✓';
+  el.innerHTML = `<div class="alert alert-${type} fade-in">${icon}&nbsp; ${message}</div>`;
+  if (type === 'success') setTimeout(() => { el.innerHTML = ''; }, 5000);
+}
+
+function clearAlerts() { document.getElementById('alerts').innerHTML = ''; }
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  if (loading) {
+    btn.dataset.originalText = btn.textContent;
+    btn.innerHTML = '<span class="spinner"></span> Odosielam...';
+  } else {
+    btn.textContent = btn.dataset.originalText || 'Odoslať';
+  }
+}
+
+// ═══════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════
+async function checkSession() {
+  try {
+    currentUser = await api('/api/auth/me');
+    updateNav();
+    const hash = getHash();
+    if (hash === 'home' || hash === 'login' || hash === 'register') {
+      navigate('dashboard');
+    } else {
+      navigate(hash);
+    }
+  } catch {
+    currentUser = null;
+    updateNav();
+    navigate(getHash());
+  }
+}
+
+async function handleRegister(e) {
+  e.preventDefault();
+  clearAlerts();
+  setLoading('reg-submit', true);
+
+  try {
+    const email = document.getElementById('reg-email').value;
+    const gdprAccepted = document.getElementById('reg-gdpr').checked;
+    const termsAccepted = document.getElementById('reg-terms').checked;
+
+    const data = await api('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ email, gdprAccepted, termsAccepted }),
+    });
+
+    showAlert(data.message, 'success');
+    document.getElementById('register-form').reset();
+  } catch (err) {
+    showAlert(err.message, 'error');
+  } finally {
+    setLoading('reg-submit', false);
+  }
+  return false;
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  clearAlerts();
+  setLoading('login-submit', true);
+
+  try {
+    const email = document.getElementById('login-email').value;
+    const data = await api('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+    showAlert(data.message, 'success');
+    document.getElementById('login-form').reset();
+  } catch (err) {
+    showAlert(err.message, 'error');
+  } finally {
+    setLoading('login-submit', false);
+  }
+  return false;
+}
+
+async function handleLogout() {
+  try {
+    await api('/api/auth/me', { method: 'DELETE' });
+  } catch {}
+  currentUser = null;
+  updateNav();
+  navigate('home');
+}
+
+// ═══════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════
+async function loadDashboard() {
+  if (!currentUser) return;
+
+  // MCP URL
+  const mcpUrl = `${APP_URL}/api/mcp/${currentUser.mcpToken}`;
+  document.getElementById('mcp-url').textContent = mcpUrl;
+
+  const statusDot = document.getElementById('mcp-status');
+  statusDot.className = `status-dot ${currentUser.hasUltrahumanToken ? 'green' : 'gray'}`;
+  statusDot.title = currentUser.hasUltrahumanToken ? 'Token nastavený' : 'Token nenastavený';
+
+  // Load token info
+  try {
+    const tokenInfo = await api('/api/user/token');
+    const el = document.getElementById('current-token');
+    if (tokenInfo.hasToken) {
+      el.textContent = tokenInfo.maskedToken;
+    } else {
+      el.textContent = 'Nie je nastavený';
+      el.style.color = 'var(--fg3)';
+    }
+  } catch {
+    document.getElementById('current-token').textContent = 'Chyba pri načítaní';
+  }
+}
+
+async function handleTokenUpdate(e) {
+  e.preventDefault();
+  clearAlerts();
+  setLoading('token-submit', true);
+
+  try {
+    const token = document.getElementById('new-token').value;
+    if (!token.trim()) {
+      showAlert('Zadajte token', 'error');
+      return false;
+    }
+
+    await api('/api/user/token', {
+      method: 'PUT',
+      body: JSON.stringify({ token }),
+    });
+
+    showAlert('Token bol úspešne uložený', 'success');
+    document.getElementById('new-token').value = '';
+    currentUser.hasUltrahumanToken = true;
+    await loadDashboard();
+  } catch (err) {
+    showAlert(err.message, 'error');
+  } finally {
+    setLoading('token-submit', false);
+  }
+  return false;
+}
+
+async function handleTokenDelete() {
+  if (!confirm('Naozaj chcete odstrániť váš Ultrahuman token?')) return;
+
+  try {
+    await api('/api/user/token', { method: 'DELETE' });
+    showAlert('Token bol odstránený', 'success');
+    currentUser.hasUltrahumanToken = false;
+    await loadDashboard();
+  } catch (err) {
+    showAlert(err.message, 'error');
+  }
+}
+
+function copyMcpUrl() {
+  const url = document.getElementById('mcp-url').textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    showAlert('MCP URL bola skopírovaná do schránky', 'success');
+  });
+}
+
+// ═══════════════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════════════
+async function loadAdminUsers() {
+  try {
+    const data = await api('/api/admin/users');
+    const tbody = document.getElementById('admin-users-tbody');
+
+    if (!data.users?.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="padding:24px;color:var(--fg3)">Žiadni používatelia</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data.users.map(u => `
+      <tr>
+        <td style="font-weight:500">${escHtml(u.email)}</td>
+        <td><span class="badge ${u.role === 'admin' ? 'badge-admin' : 'badge-user'}">${u.role}</span></td>
+        <td><span class="badge ${u.active ? 'badge-active' : 'badge-inactive'}">${u.active ? 'Aktívny' : 'Storno'}</span></td>
+        <td style="color:var(--fg3);font-size:12px">${new Date(u.createdAt).toLocaleDateString('sk')}</td>
+        <td>
+          ${u.email !== currentUser.email ? `
+            <button class="btn btn-small ${u.active ? 'btn-danger' : 'btn-outline'}"
+                    onclick="handleUserAction('${escHtml(u.email)}', '${u.active ? 'deactivate' : 'reactivate'}')">
+              ${u.active ? 'Storno' : 'Aktivovať'}
+            </button>
+          ` : '<span style="color:var(--fg3);font-size:12px">Vy</span>'}
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    showAlert(err.message, 'error');
+  }
+}
+
+async function handleUserAction(email, action) {
+  const actionLabel = action === 'deactivate' ? 'deaktivovať' : 'aktivovať';
+  if (!confirm(`Naozaj chcete ${actionLabel} účet ${email}?`)) return;
+
+  try {
+    await api('/api/admin/deactivate', {
+      method: 'POST',
+      body: JSON.stringify({ email, action }),
+    });
+    showAlert(`Účet ${email} bol ${action === 'deactivate' ? 'deaktivovaný' : 'aktivovaný'}`, 'success');
+    await loadAdminUsers();
+  } catch (err) {
+    showAlert(err.message, 'error');
+  }
+}
+
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+window.addEventListener('hashchange', () => {
+  clearAlerts();
+  const page = getHash();
+  // Auth guard
+  if ((page === 'dashboard' || page === 'admin') && !currentUser) {
+    navigate('login');
+    return;
+  }
+  if (page === 'admin' && currentUser?.role !== 'admin') {
+    navigate('dashboard');
+    return;
+  }
+  navigate(page);
+});
+
+// Boot
+checkSession();
+</script>
+</body>
+</html>

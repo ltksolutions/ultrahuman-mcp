@@ -1,136 +1,159 @@
-# 🏋️ Ultrahuman MCP Server (Vercel)
+# 🏋️ Ultrahuman MCP Server – Multi-User
 
-Remote MCP server pre Ultrahuman Ring, deploynutý na Vercel ako serverless function.
-Pripojí Claude.ai k tvojim zdravotným dátam z prsteňa.
+Multi-user MCP server pre Ultrahuman Ring na Vercel. Umožňuje viacerým používateľom pripojiť ich Ultrahuman prsteň k Claude cez osobnú MCP URL.
 
-## Dostupné nástroje (11 tools)
+## Funkcie
 
-| Tool | Popis |
-|------|-------|
-| `get_all_metrics` | Všetky metriky za daný dátum |
-| `get_sleep` | Spánok (fázy, trvanie, skóre) |
-| `get_heart_rate` | Tepová frekvencia |
-| `get_hrv` | Heart Rate Variability |
-| `get_steps` | Kroky |
-| `get_temperature` | Teplota kože |
-| `get_recovery` | Recovery index |
-| `get_movement` | Movement index, kalórie |
-| `get_vo2max` | VO2 Max |
-| `get_profile` | Profil používateľa |
-| `get_date_range` | Metriky za rozsah dátumov (max 30 dní) |
+- **Passwordless autentifikácia** — prihlásenie cez magic link v emaile, žiadne heslá
+- **Registrácia s GDPR súhlasom** — používateľ musí schváliť GDPR a Podmienky
+- **Per-user MCP endpoint** — každý používateľ dostane unikátnu MCP URL
+- **Šifrované tokeny** — Ultrahuman Auth Token je uložený šifrovane (AES-256-GCM)
+- **Dve úrovne prístupu:**
+  - **Správca** — vidí zoznam emailov, môže (de)aktivovať účty, nevidí tokeny
+  - **Používateľ** — spravuje výhradne svoj Ultrahuman Auth Token
+- **Verejné stránky** — GDPR a Podmienky sú viditeľné bez prihlásenia
+- **Responzívny design** — funkčné na mobile, tablete aj desktope
+
+## Architektúra
+
+```
+┌──────────────────────────────────────────────────┐
+│                   Claude.ai                       │
+│         (Connector: /api/mcp/{mcpToken})          │
+└──────────────┬───────────────────────────────────┘
+               │ MCP Protocol (Streamable HTTP)
+               ▼
+┌──────────────────────────────────────────────────┐
+│            Vercel Serverless Functions             │
+│                                                    │
+│  /api/mcp/[token] → lookup user → decrypt token   │
+│  /api/auth/*      → magic link auth               │
+│  /api/user/token  → manage Ultrahuman token        │
+│  /api/admin/*     → user management                │
+└──────────────┬───────────────────────────────────┘
+               │
+    ┌──────────┴──────────┐
+    ▼                     ▼
+┌────────┐        ┌─────────────┐
+│Vercel KV│        │Ultrahuman   │
+│(Redis)  │        │Partner API  │
+└────────┘        └─────────────┘
+```
+
+## Predpoklady
+
+1. **Vercel účet** (free tier stačí na začiatok)
+2. **Resend.com účet** pre odosielanie emailov (free: 100 emailov/deň)
+3. **Každý používateľ** si individuálne obstará Ultrahuman API token
 
 ---
 
-## Krok 1: Získaj Ultrahuman API prístup
+## Deploy na Vercel
 
-1. Napíš na **support@ultrahuman.com** alebo cez chat v Ultrahuman appke
-2. Požiadaj o **API Auth Token** a **Partner ID**
-3. Uveď svoj Ultrahuman email pre rýchlejšiu odpoveď
-4. Partner ID zadaj v appke: **Profile → Settings → Partner ID**
+### Krok 1: Vytvor Vercel KV store
 
-## Krok 2: Deploy na Vercel
+1. V [Vercel dashboard](https://vercel.com/dashboard) → tvoj projekt → **Storage**
+2. Klikni **Create** → **KV** (Upstash Redis)
+3. Pomenuj napr. `ultrahuman-kv` → **Create**
+4. Vercel automaticky nastaví `KV_REST_API_URL` a `KV_REST_API_TOKEN`
 
-### Variant A — Cez GitHub (odporúčané)
+### Krok 2: Nastav Resend
 
-1. Vytvor nový GitHub repo a pushni tento projekt
-2. Choď na [vercel.com](https://vercel.com) → **Add New Project**
-3. Importuj svoj GitHub repo
-4. V **Environment Variables** pridaj:
-   - `ULTRAHUMAN_AUTH_TOKEN` = tvoj token
-   - `ULTRAHUMAN_USER_EMAIL` = tvoj email
-5. Klikni **Deploy**
+1. Zaregistruj sa na [resend.com](https://resend.com)
+2. Vytvor API key
+3. (Voliteľné) Pridaj vlastnú doménu pre email
 
-### Variant B — Cez Vercel CLI
+### Krok 3: Environment Variables
+
+V Vercel dashboard → Settings → Environment Variables pridaj:
+
+| Variable | Hodnota |
+|----------|---------|
+| `RESEND_API_KEY` | `re_xxxxxxxx` |
+| `FROM_EMAIL` | `Ultrahuman MCP <noreply@vasadomena.sk>` |
+| `APP_URL` | `https://tvoja-url.vercel.app` |
+| `JWT_SECRET` | Náhodný 32+ znakový reťazec |
+| `ENCRYPTION_KEY` | Náhodný 32+ znakový reťazec |
+| `ADMIN_EMAILS` | `tvoj@email.com` |
+
+### Krok 4: Deploy
 
 ```bash
-# Inštalácia Vercel CLI (ak nemáš)
-npm i -g vercel
-
-# V adresári projektu
-cd ultrahuman-mcp-vercel
-
-# Inštalácia závislostí
+# Push na GitHub → Vercel auto-deploy
+# ALEBO manuálne:
 npm install
-
-# Deploy
-vercel
-
-# Pri prvom spustení ťa Vercel opýta na projekt,
-# môžeš priradiť k existujúcemu alebo vytvoriť nový
-
-# Nastav env vars
-vercel env add ULTRAHUMAN_AUTH_TOKEN
-vercel env add ULTRAHUMAN_USER_EMAIL
-
-# Production deploy
 vercel --prod
 ```
 
-Po deployi dostaneš URL, napr.: `https://ultrahuman-mcp.vercel.app`
+### Krok 5: Prvé prihlásenie
 
-### Overenie
+1. Otvor `https://tvoja-url.vercel.app`
+2. Klikni **Registrácia**
+3. Zadaj email → schváľ GDPR + Podmienky → odošli
+4. Skontroluj email → klikni **Potvrdiť registráciu**
+5. Prvý registrovaný používateľ je automaticky admin
 
-Otvor v prehliadači:
-```
-https://tvoja-url.vercel.app/api/health
-```
-Mal by si vidieť `{"status":"ok","server":"ultrahuman-mcp",...}`
+---
 
-## Krok 3: Pripoj do Claude.ai
+## Používanie
 
-1. Otvor **[claude.ai](https://claude.ai)** → klikni na ikonu profilu → **Settings**
-2. V ľavom sidebar klikni na **Connectors**
-3. Scroll dole → klikni **Add custom connector**
-4. Zadaj URL:
-   ```
-   https://tvoja-url.vercel.app/mcp
-   ```
-   (alebo `/api/mcp` — obe fungujú vďaka rewrite pravidlu)
-5. Klikni **Add**
-6. V novom chate: klikni **"+"** dole vľavo → **Connectors** → zapni **ultrahuman**
+### Pre používateľa:
 
-## Používanie v Claude
+1. Zaregistruj sa na webe
+2. Potvrď email kliknutím na link
+3. V dashboarde zadaj svoj Ultrahuman Auth Token
+4. Skopíruj svoju osobnú **MCP URL**
+5. V Claude.ai: Settings → Connectors → Add custom connector → vlož URL
 
-Teraz môžeš priamo v Claude písať:
+### Pre správcu:
 
-- *„Ako som dnes spal?"*
-- *„Aký bol môj HRV včera?"*
-- *„Ukáž mi trend recovery za posledný týždeň"*
-- *„Porovnaj moju tepovú frekvenciu za posledných 7 dní"*
-- *„Koľko krokov som urobil v pondelok?"*
+1. V sekcii **Správca** vidíš zoznam všetkých používateľov
+2. Môžeš (de)aktivovať účty (Storno / Aktivovať)
+3. Nevidíš Ultrahuman tokeny iných používateľov
 
-Claude automaticky zavolá príslušný tool z tvojho Ultrahuman MCP servera.
+---
 
 ## Štruktúra projektu
 
 ```
-ultrahuman-mcp-vercel/
+ultrahuman-mcp-app/
 ├── api/
-│   ├── mcp.ts              # MCP endpoint (serverless function)
-│   └── health.ts           # Health check
+│   ├── auth/
+│   │   ├── register.ts    # Registrácia (POST)
+│   │   ├── login.ts       # Prihlásenie magic link (POST)
+│   │   ├── verify.ts      # Overenie magic link (GET)
+│   │   └── me.ts          # Session check (GET) + logout (DELETE)
+│   ├── user/
+│   │   └── token.ts       # CRUD Ultrahuman token (GET/PUT/DELETE)
+│   ├── admin/
+│   │   ├── users.ts       # Zoznam používateľov (GET)
+│   │   └── deactivate.ts  # (De)aktivácia účtu (POST)
+│   ├── mcp/
+│   │   └── [token].ts     # Per-user MCP endpoint
+│   └── health.ts          # Health check
 ├── lib/
-│   ├── mcp-server.ts       # MCP server + tools registrácia
-│   └── ultrahuman-api.ts   # Ultrahuman Partner API client
-├── vercel.json             # Vercel config (rewrites, CORS, timeout)
+│   ├── db.ts              # Vercel KV databáza
+│   ├── auth.ts            # JWT session management
+│   ├── email.ts           # Resend email service
+│   ├── crypto.ts          # AES-256-GCM šifrovanie
+│   ├── mcp-server.ts      # MCP server factory (11 tools)
+│   └── ultrahuman-api.ts  # Ultrahuman Partner API client
+├── public/
+│   └── index.html         # SPA frontend (responzívny)
+├── vercel.json
 ├── package.json
 ├── tsconfig.json
-└── .env.example
+└── README.md
 ```
 
-## Troubleshooting
+## Bezpečnosť
 
-**Claude nevidí connector:**
-- Over, že URL je správna a končí na `/mcp`
-- Skontroluj `/api/health` endpoint, či server beží
-
-**API vracia 401:**
-- Token expiroval (platí ~1 týždeň) — kontaktuj Ultrahuman pre refresh
-- Over env variables vo Vercel dashboard → Settings → Environment Variables
-
-**Timeout pri `get_date_range`:**
-- Vercel free tier má 10s timeout, Pro tier 60s
-- Pre 30-dňový rozsah potrebuješ Pro tier
-- Alternatíva: volaj `get_all_metrics` po jednom dni
+- Autentifikácia len cez magic linky (žiadne heslá)
+- Magic linky sú jednorazové, platné 30 minút
+- Ultrahuman tokeny šifrované AES-256-GCM
+- JWT session cookies (HttpOnly, SameSite)
+- Admin nemá prístup k tokenom používateľov
+- MCP URL je unikátna per-user (48-znakový náhodný token)
 
 ## Licencia
 
