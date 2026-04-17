@@ -1,0 +1,23 @@
+{
+  "name": "ultrahuman-mcp-vercel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ultrahuman Ring MCP Server for Vercel",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "express": "^5.1.0",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^22.15.3",
+    "@vercel/node": "^5.1.8",
+    "typescript": "^5.8.3",
+    "vercel": "^41.7.3"
+  }
+}
