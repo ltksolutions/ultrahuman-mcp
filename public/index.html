@@ -151,6 +151,49 @@
     .legal p, .legal li { font-size: 14px; color: var(--fg2); margin-bottom: 8px; }
     .legal ul { padding-left: 20px; }
 
+    /* ─── Docs ─── */
+    .docs h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+    .docs h2 { font-size: 17px; font-weight: 600; margin: 24px 0 10px; color: var(--fg); }
+    .docs h3 { font-size: 14px; font-weight: 600; margin: 18px 0 6px; color: var(--fg); }
+    .docs p, .docs li { font-size: 14px; color: var(--fg2); margin-bottom: 8px; line-height: 1.6; }
+    .docs ul, .docs ol { padding-left: 20px; margin-bottom: 12px; }
+    .docs a { color: var(--accent); text-decoration: underline; }
+    .docs code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--bg3); padding: 2px 6px; border-radius: 4px; color: var(--fg); }
+    .docs pre { background: var(--bg3); padding: 12px; border-radius: 8px; overflow-x: auto; font-size: 12px; font-family: 'JetBrains Mono', monospace; margin: 8px 0 12px; }
+    .q-box {
+      background: var(--bg); border-left: 3px solid var(--accent); padding: 10px 14px;
+      margin: 6px 0; border-radius: 0 6px 6px 0; font-size: 14px; color: var(--fg);
+    }
+    .q-box::before { content: '„'; color: var(--accent); font-size: 18px; font-weight: 700; margin-right: 4px; }
+    .q-box::after { content: '"'; color: var(--accent); font-size: 18px; font-weight: 700; margin-left: 2px; }
+    .topic-label {
+      display: inline-block; font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .5px; color: var(--accent2); margin: 14px 0 4px; padding: 3px 8px;
+      background: var(--accent-light); border-radius: 4px;
+    }
+    .tools-tab { margin: 12px -8px; font-size: 13px; }
+    .tools-tab th { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--fg3); font-weight: 600; padding: 8px; text-align: left; border-bottom: 1px solid var(--border); }
+    .tools-tab td { padding: 10px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .tools-tab td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent2); font-weight: 500; white-space: nowrap; }
+    .step {
+      display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px;
+    }
+    .step-num {
+      flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+      background: var(--accent); color: #fff; font-size: 12px; font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-body { flex: 1; font-size: 14px; color: var(--fg2); }
+    .step-body strong { color: var(--fg); }
+    .info-box {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px 16px; margin: 12px 0; font-size: 13px; color: var(--fg2);
+    }
+    .info-box strong { color: var(--fg); display: block; margin-bottom: 4px; }
+    .toc-list { list-style: none; padding-left: 0; }
+    .toc-list li { margin-bottom: 4px; }
+    .toc-list a { font-size: 14px; }
+
     /* ─── Misc ─── */
     .hidden { display: none !important; }
     .text-center { text-align: center; }
@@ -409,6 +452,293 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PAGE: DOCUMENTATION -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="page-docs" class="page">
+    <div class="fade-in">
+
+      <!-- Table of contents -->
+      <div class="card">
+        <h1 style="font-size:22px;font-weight:700;margin-bottom:12px">Dokumentácia</h1>
+        <p style="font-size:14px;color:var(--fg2)">Všetko, čo potrebujete vedieť o používaní Ultrahuman MCP servera s Claude.ai.</p>
+        <ul class="toc-list" style="margin-top:16px">
+          <li><a href="#docs-examples">1. Ako sa pýtať Claude na vaše dáta</a></li>
+          <li><a href="#docs-howitworks">2. Ako funguje MCP server</a></li>
+          <li><a href="#docs-tools">3. Čo obsahuje MCP server</a></li>
+          <li><a href="#docs-skill">4. Skill pre interpretáciu dát</a></li>
+        </ul>
+      </div>
+
+      <!-- ─── Section 1: Example Questions ─── -->
+      <div class="card docs" id="docs-examples">
+        <h1>1. Ako sa pýtať Claude na vaše dáta</h1>
+        <p>Po pripojení MCP connectora v Claude.ai môžete Claude klásť otázky v prirodzenej reči. Claude sám rozhodne, ktorý MCP nástroj použije. Tu je niekoľko osvedčených otázok, roztriedených podľa scenára.</p>
+
+        <div class="topic-label">Ranný check-in</div>
+        <div class="q-box">Ako som dnes na tom?</div>
+        <div class="q-box">Aké je moje recovery dnes?</div>
+        <div class="q-box">Ako som sa dnes v noci vyspal?</div>
+
+        <div class="topic-label">Tréning a aktivita</div>
+        <div class="q-box">Mám dnes ísť tvrdo cvičiť?</div>
+        <div class="q-box">Som dostatočne zotavený na dlhý beh?</div>
+        <div class="q-box">Mám zajtra polmaratón — som na neho pripravený?</div>
+
+        <div class="topic-label">HRV a stres</div>
+        <div class="q-box">Môj HRV je dnes 38 — je to v poriadku?</div>
+        <div class="q-box">Ako sa mi vyvíja HRV za posledný týždeň?</div>
+
+        <div class="topic-label">Trendy a porovnania</div>
+        <div class="q-box">Ukáž mi trend recovery za posledných 7 dní</div>
+        <div class="q-box">Porovnaj môj spánok minulý týždeň s tento týždňom</div>
+        <div class="q-box">Zlepšilo sa moje VO2 Max za posledný mesiac?</div>
+
+        <div class="topic-label">Špecifické situácie</div>
+        <div class="q-box">Pil som včera víno — ako to ovplyvnilo môj spánok?</div>
+        <div class="q-box">Necítim sa dobre, zisti niečo z dát</div>
+        <div class="q-box">Letel som cez 6 časových pásiem — koľko dní mi trvalo sa zotaviť?</div>
+
+        <div class="topic-label">Glukóza (pre Ultrahuman M1 CGM)</div>
+        <div class="q-box">Aká bola moja priemerná glukóza včera?</div>
+        <div class="q-box">Kedy som mal najvyšší glukózový spike?</div>
+
+        <div class="info-box" style="margin-top:20px">
+          <strong>Tip</strong>
+          Claude rozumie aj neformálnym otázkam typu „no tak čo, ako mi to išlo?" alebo „fakt sa necítim dobre, pozri sa na to". Nemusíte sa držať presných formuliek.
+        </div>
+      </div>
+
+      <!-- ─── Section 2: How MCP Server Works ─── -->
+      <div class="card docs" id="docs-howitworks">
+        <h1>2. Ako funguje MCP server</h1>
+
+        <h2>Čo je MCP?</h2>
+        <p><strong>Model Context Protocol (MCP)</strong> je otvorený štandard od Anthropic, ktorý umožňuje AI modelom ako Claude pripojiť sa k externým nástrojom a dátovým zdrojom. Fungue ako univerzálny konektor — podobne ako USB-C, ale pre AI.</p>
+
+        <h2>Čo robí tento MCP server?</h2>
+        <p>Tento server pôsobí ako bezpečný sprostredkovateľ medzi Claude a Ultrahuman Partner API. Keď sa v Claude spýtate na svoje dáta:</p>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">Claude zavolá váš osobný MCP endpoint (URL vo formáte <code>/api/mcp/[váš-token]</code>)</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">Server overí váš token, dešifruje váš Ultrahuman API kľúč a pošle požiadavku na Ultrahuman</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">Ultrahuman API vráti všetky vaše metriky pre požadovaný dátum</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">Server vyfiltruje relevantnú časť odpovede a pošle ju späť do Claude, ktorý vám ju zrozumiteľne interpretuje</div>
+        </div>
+
+        <h2>Oficiálne Ultrahuman API</h2>
+        <p>Tento MCP server používa oficiálne <strong>Ultrahuman Partner API</strong>. Dokumentáciu nájdete tu:</p>
+        <ul>
+          <li><a href="https://ultrahumanapp.notion.site/UltraSignal-API-Documentation-5f32ec15ef6b4fa5bc8249f7b875d212" target="_blank" rel="noopener">UltraSignal API Documentation</a> — oficiálna dokumentácia na Notion</li>
+          <li><a href="https://blog.ultrahuman.com/blog/accessing-the-ultrahuman-partnership-api/" target="_blank" rel="noopener">Prehľad Partner API</a> — na blogu Ultrahuman</li>
+        </ul>
+        <p>API používa jediný endpoint: <code>GET https://partner.ultrahuman.com/api/v1/metrics?email=...&date=YYYY-MM-DD</code> s autorizačným kľúčom v HTTP hlavičke. Vracia kompletné dáta pre daný dátum v jednej odpovedi.</p>
+
+        <h2>Bezpečnosť</h2>
+        <p>Váš Ultrahuman API token je v databáze uložený <strong>šifrovane (AES-256-GCM)</strong>. Nikto — ani správca systému — ho nevidí v čitateľnej forme. Pri každom volaní sa token dešifruje len v pamäti servera na dobu potrebnú na zavolanie Ultrahuman API.</p>
+        <p>Vaša MCP URL obsahuje 48-znakový náhodný token. Ktokoľvek, kto by tento URL získal, by mohol čítať vaše Ultrahuman dáta — preto ju nezdieľajte.</p>
+      </div>
+
+      <!-- ─── Section 3: MCP Tools ─── -->
+      <div class="card docs" id="docs-tools">
+        <h1>3. Čo obsahuje MCP server</h1>
+        <p>Server sprístupňuje Claude 11 nástrojov (tools). Claude ich volá automaticky na základe vašej otázky — nemusíte ich volať manuálne.</p>
+
+        <div style="overflow-x:auto">
+          <table class="tools-tab">
+            <thead>
+              <tr>
+                <th>Nástroj</th>
+                <th>Čo vracia</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>get_all_metrics</td>
+                <td>Kompletné dáta za daný deň — všetky metriky naraz</td>
+              </tr>
+              <tr>
+                <td>get_sleep</td>
+                <td>Spánok: skóre, fázy (hlboký/ľahký/REM/prebúdzanie), efektivita, graf HR/HRV počas spánku, AI insights</td>
+              </tr>
+              <tr>
+                <td>get_heart_rate</td>
+                <td>Tepová frekvencia: priebeh počas dňa, pokojový tep v noci (night_rhr)</td>
+              </tr>
+              <tr>
+                <td>get_hrv</td>
+                <td>Heart Rate Variability — denný priebeh a priemer</td>
+              </tr>
+              <tr>
+                <td>get_steps</td>
+                <td>Kroky — priebeh a denný priemer</td>
+              </tr>
+              <tr>
+                <td>get_temperature</td>
+                <td>Teplota kože počas spánku v °C</td>
+              </tr>
+              <tr>
+                <td>get_recovery</td>
+                <td>Recovery Score (0–10) a Recovery Index (0–100)</td>
+              </tr>
+              <tr>
+                <td>get_movement</td>
+                <td>Pohyb a Movement Index (0–100)</td>
+              </tr>
+              <tr>
+                <td>get_vo2max</td>
+                <td>Odhad VO2 Max (kardiorespiračná zdatnosť)</td>
+              </tr>
+              <tr>
+                <td>get_glucose</td>
+                <td>Glukóza, metabolický skóre, HbA1c, time in target (vyžaduje Ultrahuman M1 CGM)</td>
+              </tr>
+              <tr>
+                <td>get_date_range</td>
+                <td>Všetky metriky za rozsah dátumov (max 14 dní) — pre trendy a porovnania</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="info-box">
+          <strong>Optimalizácia</strong>
+          Server má zabudovaný 60-sekundový cache. Ak sa Claude v rámci jednej otázky pýta na viacero metrík za rovnaký dátum (napr. <code>get_sleep</code> + <code>get_hrv</code>), Ultrahuman API sa zavolá len raz.
+        </div>
+      </div>
+
+      <!-- ─── Section 4: Skill ─── -->
+      <div class="card docs" id="docs-skill">
+        <h1>4. Skill pre interpretáciu dát</h1>
+
+        <h2>Čo je Claude Skill?</h2>
+        <p><strong>Skill</strong> je balík inštrukcií, ktorý Claude načíta, keď sa mu zíde — v tomto prípade pri otázkach o zdravotných dátach. MCP server poskytuje <em>dáta</em>, skill poskytuje <em>know-how, ako ich interpretovať</em>.</p>
+        <p>Bez skillu Claude interpretuje Ultrahuman dáta na základe všeobecných znalostí. So skillom má konzistentnejšie odporúčania, pozná typické prahy pre HRV/RHR, vie používať workflow šablóny a dodržiava bezpečnostné pravidlá (nediagnostikuje, pri extrémoch odporúča lekára).</p>
+
+        <h2>Čo obsahuje skill <code>ultrahuman-interpretation</code>?</h2>
+
+        <h3>SKILL.md (hlavný súbor)</h3>
+        <ul>
+          <li>Kľúčový princíp: <strong>osobná baseline prevažuje nad absolútnymi hodnotami</strong></li>
+          <li>Prehľad metrík a ich typov v API odpovedi</li>
+          <li>Bezpečnostné pravidlá (nediagnostikovať, neprepísať lieky, neradiť extrémne intervencie)</li>
+          <li>5 hlavných workflow šablón: ranný check-in, tréningové rozhodovanie, sleep review, weekly review, detekcia choroby</li>
+        </ul>
+
+        <h3>references/metrics-guide.md</h3>
+        <ul>
+          <li>Detailné interpretačné rozsahy pre každú metriku</li>
+          <li>Typické hodnoty podľa veku a fitness úrovne</li>
+          <li>VO2 Max tabuľka podľa veku a pohlavia</li>
+          <li>Výklad jednotlivých komponentov v sleep summary</li>
+        </ul>
+
+        <h3>references/safety.md</h3>
+        <ul>
+          <li>Red-flag vzory (akútna choroba, overtraining, spánková porucha, metabolická dysfunkcia)</li>
+          <li>Zoznam čo povedať a čo nehovoriť</li>
+          <li>Pravidlá pre tehotenstvo a citlivé situácie</li>
+          <li>Ako reagovať, keď dáta protirečia pocitu používateľa</li>
+        </ul>
+
+        <h3>references/workflows.md</h3>
+        <ul>
+          <li>Rozšírené scenáre: kontrola po alkohole, jetlag, menštruačný cyklus</li>
+          <li>Training load review, pred-súťažný taper</li>
+          <li>Nový používateľ, dlhodobé trendy</li>
+          <li>Interpretácia glukózových dát</li>
+        </ul>
+
+        <h2>Inštalácia skillu do Claude.ai</h2>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body"><strong>Stiahnite</strong> súbor <code>ultrahuman-interpretation.skill</code>.
+            <div style="margin-top:8px">
+              <a href="/ultrahuman-interpretation.skill" download class="btn btn-small btn-primary" style="display:inline-flex;text-decoration:none">Stiahnuť skill</a>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">V <strong>Claude.ai</strong> kliknite na ikonu profilu → <strong>Settings</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">V bočnom menu nájdite <strong>Capabilities → Skills</strong> (alebo priamo Skills, podľa verzie)</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">Kliknite <strong>Upload skill</strong> a nahrajte stiahnutý <code>.skill</code> súbor</div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">Hotovo. Skill sa aktivuje <strong>automaticky</strong>, keď sa pýtate na Ultrahuman dáta — nemusíte ho manuálne zapínať</div>
+        </div>
+
+        <h2>Ako sa skill používa?</h2>
+        <p>Skill funguje v pozadí. Keď napíšete otázku, ktorá spadá do jeho oblasti (spánok, recovery, HRV, tréningové rozhodnutia), Claude:</p>
+        <ol>
+          <li>Zavolá príslušný MCP nástroj (napr. <code>get_sleep</code>)</li>
+          <li>Načíta skill inštrukcie</li>
+          <li>Ak je otázka zložitá, načíta aj relevantný reference súbor (napr. <code>metrics-guide.md</code>)</li>
+          <li>Interpretuje dáta podľa pravidiel skillu a odpovie vám</li>
+        </ol>
+        <p>Výsledok: namiesto generických textov dostanete konkrétne čísla, porovnania s vašou baseline a konkrétne odporúčanie.</p>
+
+        <h2>Úprava skillu podľa vlastných potrieb</h2>
+        <p>Skill je len obyčajný ZIP archív s Markdown súbormi. Môžete si ho prispôsobiť:</p>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body"><strong>Premenujte</strong> súbor z <code>.skill</code> na <code>.zip</code> a rozbaľte</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body"><strong>Upravte</strong> obsah podľa potreby — môžete napríklad:
+            <ul style="margin-top:6px;margin-bottom:0">
+              <li>Zmeniť tón (viac formálny / uvoľnenejší)</li>
+              <li>Pridať vlastné trénerské inštrukcie do <code>workflows.md</code></li>
+              <li>Upraviť interpretačné rozsahy v <code>metrics-guide.md</code> podľa vašich špecifík (napr. ak ste extrémny športovec a bežné rozsahy nesedia)</li>
+              <li>Rozšíriť bezpečnostné pravidlá v <code>safety.md</code></li>
+            </ul>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body"><strong>Zbalte</strong> späť do ZIP archívu — dôležité: adresár <code>ultrahuman-interpretation/</code> musí byť v koreni ZIP-u</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body"><strong>Premenujte</strong> späť na <code>.skill</code> a nainštalujte podľa krokov vyššie (pôvodnú verziu predtým odstráňte)</div>
+        </div>
+
+        <div class="info-box">
+          <strong>Poznámka pre vývojárov</strong>
+          Štruktúra skillu musí zachovať YAML frontmatter v <code>SKILL.md</code> (<code>name</code> a <code>description</code>). Popis (description) rozhoduje o tom, kedy sa skill spustí — ak ho zmeníte príliš úzko, skill sa nemusí aktivovať pri relevantných otázkach.
+        </div>
+
+        <h2>Obmedzenia</h2>
+        <ul>
+          <li>Skill je potrebné <strong>nainštalovať individuálne</strong> v každom Claude účte — nedá sa zdieľať cez MCP server</li>
+          <li>Skill beží len v Claude.ai (web, desktop, mobile) — nie v Claude API pokiaľ nie je volaný cez Skills v API</li>
+          <li>Interpretácia je orientačná — <strong>nenahrádza lekársku konzultáciu</strong></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -454,6 +784,7 @@ function updateNav() {
     let links = `
       <a href="#dashboard">Dashboard</a>
       ${currentUser.role === 'admin' ? '<a href="#admin">Správca</a>' : ''}
+      <a href="#docs">Dokumentácia</a>
       <a href="#gdpr">GDPR</a>
       <a href="#terms">Podmienky</a>
       <button onclick="handleLogout()">Odhlásiť</button>
@@ -461,6 +792,7 @@ function updateNav() {
     nav.innerHTML = links;
   } else {
     nav.innerHTML = `
+      <a href="#docs">Dokumentácia</a>
       <a href="#gdpr">GDPR</a>
       <a href="#terms">Podmienky</a>
     `;
