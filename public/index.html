@@ -158,6 +158,11 @@
     .docs p, .docs li { font-size: 14px; color: var(--fg2); margin-bottom: 8px; line-height: 1.6; }
     .docs ul, .docs ol { padding-left: 20px; margin-bottom: 12px; }
     .docs a { color: var(--accent); text-decoration: underline; }
+    .docs a.btn, .docs a.btn:hover {
+      text-decoration: none;
+    }
+    .docs a.btn-primary { color: #fff; }
+    .docs a.btn-outline { color: var(--fg2); }
     .docs code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--bg3); padding: 2px 6px; border-radius: 4px; color: var(--fg); }
     .docs pre { background: var(--bg3); padding: 12px; border-radius: 8px; overflow-x: auto; font-size: 12px; font-family: 'JetBrains Mono', monospace; margin: 8px 0 12px; }
     .q-box {
@@ -190,6 +195,28 @@
       padding: 14px 16px; margin: 12px 0; font-size: 13px; color: var(--fg2);
     }
     .info-box strong { color: var(--fg); display: block; margin-bottom: 4px; }
+    .email-template {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 16px 18px; margin: 10px 0 4px; font-size: 13.5px; color: var(--fg);
+      line-height: 1.6; white-space: pre-wrap; font-family: 'DM Sans', sans-serif;
+    }
+    .email-template .subject {
+      font-weight: 600; padding-bottom: 8px; margin-bottom: 12px;
+      border-bottom: 1px solid var(--border); color: var(--fg);
+    }
+    .email-template .subject-label,
+    .email-template .to-label {
+      color: var(--fg3); font-size: 11px; text-transform: uppercase;
+      letter-spacing: .5px; font-weight: 600; display: inline-block; min-width: 56px;
+    }
+    .email-template .to-row {
+      padding-bottom: 12px; margin-bottom: 12px;
+      border-bottom: 1px solid var(--border); font-size: 13px;
+    }
+    .email-template .placeholder {
+      background: var(--amber-light); color: var(--amber);
+      padding: 1px 6px; border-radius: 3px; font-size: 12px; font-weight: 500;
+    }
     .toc-list { list-style: none; padding-left: 0; }
     .toc-list li { margin-bottom: 4px; }
     .toc-list a { font-size: 14px; }
@@ -236,9 +263,34 @@
     <div class="card">
       <h3>Ako to funguje?</h3>
       <p>1. Zaregistruj sa s emailom z tvojho Ultrahuman účtu</p>
-      <p>2. Zadaj svoj Ultrahuman API token</p>
+      <p>2. Požiadaj Ultrahuman o API token (stačí email na <a href="mailto:support@ultrahuman.com" style="color:var(--accent)">support@ultrahuman.com</a>) a&nbsp;zadaj ho v Dashboarde</p>
       <p>3. Skopíruj svoju osobnú MCP URL do Claude.ai → Settings → Connectors</p>
-      <p style="margin-top:16px"><a href="#gdpr" style="color:var(--accent);font-size:13px">GDPR</a> · <a href="#terms" style="color:var(--accent);font-size:13px">Podmienky používania</a></p>
+      <p style="margin-top:16px"><a href="#docs-token" style="color:var(--accent);font-size:13px">Ako získať API token</a> · <a href="#gdpr" style="color:var(--accent);font-size:13px">GDPR</a> · <a href="#terms" style="color:var(--accent);font-size:13px">Podmienky používania</a></p>
+    </div>
+
+    <div class="card docs">
+      <h3 style="margin-bottom:4px">Ako sa potom môžeš pýtať Claude?</h3>
+      <p style="font-size:13px;color:var(--fg2);margin-bottom:14px">Otázky píš prirodzene — Claude automaticky vyberie správny nástroj.</p>
+
+      <div class="topic-label" style="margin-top:0">Ranný check-in</div>
+      <div class="q-box">Ako som dnes na tom?</div>
+      <div class="q-box">Ako som sa dnes v noci vyspal?</div>
+
+      <div class="topic-label">Tréning</div>
+      <div class="q-box">Mám dnes ísť tvrdo cvičiť?</div>
+      <div class="q-box">Som dostatočne zotavený na dlhý beh?</div>
+
+      <div class="topic-label">Trendy a porovnania</div>
+      <div class="q-box">Ukáž mi trend recovery za posledných 7 dní</div>
+      <div class="q-box">Zlepšilo sa moje VO2 Max za posledný mesiac?</div>
+
+      <div class="topic-label">Špecifické situácie</div>
+      <div class="q-box">Pil som včera víno — ako to ovplyvnilo môj spánok?</div>
+      <div class="q-box">Necítim sa dobre, zisti niečo z dát</div>
+
+      <p style="margin-top:16px;font-size:13px;color:var(--fg2)">
+        Viac príkladov a kompletný popis funkcií nájdeš v <a href="#docs" style="color:var(--accent)">Dokumentácii</a>.
+      </p>
     </div>
   </div>
 
@@ -332,7 +384,7 @@
           <div class="field">
             <label for="new-token">Nový token</label>
             <input type="text" id="new-token" placeholder="Zadajte váš Ultrahuman Auth Token">
-            <p class="input-hint">Token získate od Ultrahuman podpory (support@ultrahuman.com)</p>
+            <p class="input-hint">Token získate bezplatne emailom na <a href="mailto:support@ultrahuman.com" style="color:var(--accent)">support@ultrahuman.com</a>. <a href="#docs-token" style="color:var(--accent)">Ukáž mi ako →</a></p>
           </div>
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button type="submit" class="btn btn-primary btn-small" id="token-submit">Uložiť token</button>
@@ -465,8 +517,9 @@
         <ul class="toc-list" style="margin-top:16px">
           <li><a href="#docs-examples">1. Ako sa pýtať Claude na vaše dáta</a></li>
           <li><a href="#docs-howitworks">2. Ako funguje MCP server</a></li>
-          <li><a href="#docs-tools">3. Čo obsahuje MCP server</a></li>
-          <li><a href="#docs-skill">4. Skill pre interpretáciu dát</a></li>
+          <li><a href="#docs-token">3. Ako získať Ultrahuman API token</a></li>
+          <li><a href="#docs-tools">4. Čo obsahuje MCP server</a></li>
+          <li><a href="#docs-skill">5. Skill pre interpretáciu dát</a></li>
         </ul>
       </div>
 
@@ -549,9 +602,75 @@
         <p>Vaša MCP URL obsahuje 48-znakový náhodný token. Ktokoľvek, kto by tento URL získal, by mohol čítať vaše Ultrahuman dáta — preto ju nezdieľajte.</p>
       </div>
 
-      <!-- ─── Section 3: MCP Tools ─── -->
+      <!-- ─── Section 3: How to get API token ─── -->
+      <div class="card docs" id="docs-token">
+        <h1>3. Ako získať Ultrahuman API token</h1>
+        <p>Ultrahuman Partner API je k dispozícii <strong>bezplatne na vyžiadanie</strong>. Postup je jednoduchý:</p>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <strong>Pošlite email na <a href="mailto:support@ultrahuman.com">support@ultrahuman.com</a></strong>
+            <div style="margin-top:4px;font-size:13px">Alternatívne môžete použiť aj chat podpory priamo v Ultrahuman mobilnej aplikácii (Profile → Support).</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">V emaile požiadajte o <strong>API Authorization Key</strong> a <strong>Partner ID</strong>. Nezabudnite uviesť email, ktorý používate pre Ultrahuman konto — urýchli to spracovanie žiadosti.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            Po obdržaní odpovede otvorte <strong>Ultrahuman mobilnú aplikáciu</strong> → záložka <strong>Profile</strong> → ikona nastavení (ozubené koliesko) vľavo hore → nájdite <strong>Partner ID</strong> a zadajte ho
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            Zadaný <strong>API Authorization Key</strong> skopírujte a vložte do poľa „Nový token" v <a href="#dashboard" style="color:var(--accent)">Dashboarde</a> tejto aplikácie
+          </div>
+        </div>
+
+        <h2>Vzorový email pre Ultrahuman (anglický)</h2>
+        <p>Skopírujte a upravte podľa seba — nahraďte žlté polia svojimi údajmi:</p>
+
+        <div class="email-template" id="email-template">
+<span class="to-label">To:</span> support@ultrahuman.com
+<div class="subject"><span class="subject-label">Subject:</span> Request for Partner API access — personal use</div>Hi Ultrahuman team,
+
+I'd like to request access to the Ultrahuman Partnership API for personal use with my Ultrahuman Ring. I plan to connect my ring data to an AI assistant (Claude via the Model Context Protocol) so I can get personalised insights about my sleep, recovery and HRV. The integration reads only my own data and is not intended for any commercial purpose or redistribution.
+
+Could you please provide me with:
+• API Authorization Key
+• Partner ID (to enter in the Ultrahuman app under Profile → Settings → Partner ID)
+
+My Ultrahuman account email: <span class="placeholder">your-ultrahuman-email@example.com</span>
+
+Thank you very much for your help. I'm looking forward to your reply.
+
+Best regards,
+<span class="placeholder">Your Name</span>
+        </div>
+
+        <div style="margin:10px 0 4px;display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn btn-small btn-outline" onclick="copyEmailTemplate()">Kopírovať text emailu</button>
+          <a href="mailto:support@ultrahuman.com?subject=Request%20for%20Partner%20API%20access%20%E2%80%94%20personal%20use" class="btn btn-small btn-primary" style="text-decoration:none">Otvoriť v emailovom klientovi</a>
+        </div>
+
+        <div class="info-box" style="margin-top:20px">
+          <strong>Poznámka k Partner ID</strong>
+          Partner ID zadáte priamo v Ultrahuman mobilnej aplikácii (Profile → Settings → Partner ID). Tento krok dáva spoločnosti Ultrahuman súhlas, aby mohla sprístupňovať vaše dáta cez Partner API. Bez neho API volania vrátia chybu aj napriek platnému tokenu.
+        </div>
+
+        <div class="info-box">
+          <strong>Ako dlho platí token?</strong>
+          Podľa oficiálnej dokumentácie platí access token približne 1 týždeň. V prípade exspirácie alebo problémov s prístupom kontaktujte Ultrahuman podporu znova.
+        </div>
+      </div>
+
+      <!-- ─── Section 4: MCP Tools ─── -->
       <div class="card docs" id="docs-tools">
-        <h1>3. Čo obsahuje MCP server</h1>
+        <h1>4. Čo obsahuje MCP server</h1>
         <p>Server sprístupňuje Claude 11 nástrojov (tools). Claude ich volá automaticky na základe vašej otázky — nemusíte ich volať manuálne.</p>
 
         <div style="overflow-x:auto">
@@ -617,9 +736,9 @@
         </div>
       </div>
 
-      <!-- ─── Section 4: Skill ─── -->
+      <!-- ─── Section 5: Skill ─── -->
       <div class="card docs" id="docs-skill">
-        <h1>4. Skill pre interpretáciu dát</h1>
+        <h1>5. Skill pre interpretáciu dát</h1>
 
         <h2>Čo je Claude Skill?</h2>
         <p><strong>Skill</strong> je balík inštrukcií, ktorý Claude načíta, keď sa mu zíde — v tomto prípade pri otázkach o zdravotných dátach. MCP server poskytuje <em>dáta</em>, skill poskytuje <em>know-how, ako ich interpretovať</em>.</p>
@@ -759,7 +878,22 @@ function getHash() {
     window.location.hash = '#home';
     return 'home';
   }
+  // handle sub-anchors: "docs-tools" -> page "docs" with scroll target "docs-tools"
+  if (h.startsWith('docs-') || h.startsWith('docs/')) {
+    return 'docs';
+  }
   return h;
+}
+
+function scrollToAnchor() {
+  const h = window.location.hash.slice(1);
+  if (!h || h === 'home') return;
+  // Try to find element with the exact hash as id
+  const target = document.getElementById(h);
+  if (target) {
+    // Small delay to let the page render/transition first
+    setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  }
 }
 
 function navigate(page) {
@@ -852,6 +986,7 @@ async function checkSession() {
     updateNav();
     navigate(getHash());
   }
+  scrollToAnchor();
 }
 
 async function handleRegister(e) {
@@ -987,6 +1122,18 @@ function copyMcpUrl() {
   });
 }
 
+function copyEmailTemplate() {
+  const tpl = document.getElementById('email-template');
+  if (!tpl) return;
+  // Use innerText to get clean text (strips HTML tags but preserves line breaks)
+  const text = tpl.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    showAlert('Text emailu bol skopírovaný do schránky', 'success');
+  }).catch(() => {
+    showAlert('Nepodarilo sa skopírovať text', 'error');
+  });
+}
+
 // ═══════════════════════════════════════════
 // ADMIN
 // ═══════════════════════════════════════════
@@ -1059,6 +1206,7 @@ window.addEventListener('hashchange', () => {
     return;
   }
   navigate(page);
+  scrollToAnchor();
 });
 
 // Boot
