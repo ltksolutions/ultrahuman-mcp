@@ -153,7 +153,7 @@ ultrahuman-mcp-app/
 
 - Autentifikácia len cez magic linky (žiadne heslá)
 - Magic linky sú jednorazové, platné 30 minút
-- Ultrahumantokeny šifrované AES-256-GCM
+- Ultrahuman tokeny šifrované AES-256-GCM
 - JWT session cookies (HttpOnly, SameSite)
 - Admin nemá prístup k tokenom používateľov
 - MCP URL je unikátna per-user (48-znakový náhodný token)
